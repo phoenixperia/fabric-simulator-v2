@@ -43,14 +43,13 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
     const ctx = canvas.getContext('2d');
     const W = CANVAS_W, H = CANVAS_H;
 
-    // 背景
-    ctx.fillStyle = background;
-    ctx.fillRect(0, 0, W, H);
-
-    // マネキン素体（元の背景をそのまま描画）
+    // マネキン素体（スタジオ背景色を目的の背景色に置き換えて描画）
     const mannequin = imgs.current[BASE_IMAGES.mannequin];
     if (mannequin) {
-      ctx.drawImage(mannequin, 0, 0, W, H);
+      drawMannequinBGSwap(ctx, mannequin, background, W, H);
+    } else {
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, W, H);
     }
 
     // インナー（ロングT等。シャツの下に描画）
@@ -218,9 +217,6 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         ctx.restore();
       }
     }
-
-    // ── 背景色置換（グレー背景ピクセルを指定色に変換）────────
-    replaceBackground(ctx, W, H, background);
 
     // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
     drawFieroLogo(ctx, W, H);
@@ -488,23 +484,49 @@ function drawGarmentEdge(ctx, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, edgeW
   ctx.drawImage(maskCanvas, 0, 0);
 }
 
-// ── 背景色置換（全描画後にグレー背景ピクセルを指定色に差し替え）──
-function replaceBackground(ctx, W, H, bgHex) {
-  const [nr, ng, nb] = hexToRgb(bgHex);
-  const imageData = ctx.getImageData(0, 0, W, H);
-  const d = imageData.data;
+// ── マネキン背景色置き換え描画 ──────────────────────────
+// mannequin_v4 のスタジオ背景（紫グレー RGB≈183,171,181）を
+// 指定した背景色に滑らかに置き換えて描画する
+function drawMannequinBGSwap(ctx, mannequinImg, bgHex, W, H) {
+  const bgRgb = hexToRgb(bgHex);               // 目的の背景色
+  const studioR = 183, studioG = 171, studioB = 181;  // スタジオ背景色（紫グレー）
+
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const offCtx = off.getContext('2d');
+  offCtx.drawImage(mannequinImg, 0, 0, W, H);
+  const imgData = offCtx.getImageData(0, 0, W, H);
+  const d = imgData.data;
+
   for (let i = 0; i < d.length; i += 4) {
     const r = d[i], g = d[i+1], b = d[i+2];
-    const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
-    // 肌色はより厳密に除外（赤が25以上支配的）
-    const isSkin = r > g + 25 && r > b + 25;
-    // 低彩度・中〜高輝度のピクセルを背景とみなす
-    const isGrayBg = (maxC - minC) < 30 && r > 150 && r < 248 && !isSkin;
-    if (isGrayBg) {
-      d[i] = nr; d[i+1] = ng; d[i+2] = nb;
+
+    // ── 肌色ピクセルは絶対に変更しない ──
+    // 肌色: R が G より 8以上高く、かつ R が B より 15以上高い暖色系
+    // スタジオ背景(183,171,181): r-b=2 < 15 → 除外されない ✓
+    // 肌色(210,180,160): r-b=50 > 15 → 除外される ✓
+    if ((r - g) > 8 && (r - b) > 15) continue;
+
+    // スタジオ背景色からの距離（0=完全一致 → ÷70 で正規化）
+    const dist = Math.sqrt(
+      (r - studioR) ** 2 +
+      (g - studioG) ** 2 +
+      (b - studioB) ** 2
+    ) / 70;
+    const t = Math.min(1, dist);   // 0→背景, 1→マネキン本体
+
+    if (t < 0.95) {
+      // 背景色へのブレンド比率（距離が小さいほど背景色に近づく）
+      const blend = Math.max(0, 1 - t / 0.95);
+      d[i]   = Math.round(r * (1 - blend) + bgRgb[0] * blend);
+      d[i+1] = Math.round(g * (1 - blend) + bgRgb[1] * blend);
+      d[i+2] = Math.round(b * (1 - blend) + bgRgb[2] * blend);
     }
+    // t >= 0.95: 変更なし（マネキン本体ピクセル）
   }
-  ctx.putImageData(imageData, 0, 0);
+
+  offCtx.putImageData(imgData, 0, 0);
+  ctx.drawImage(off, 0, 0);
 }
 
 // ── グレー背景クロマキー描画（マスク不要）──────────────

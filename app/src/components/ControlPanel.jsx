@@ -28,8 +28,9 @@ export default function ControlPanel({
         {/* シャツ */}
         <label className="toggle-row">
           <input type="checkbox" checked={shirtVisible}
+            disabled={innerType === 'longt' || innerType === 'turtleneck'}
             onChange={e => setShirtVisible(e.target.checked)} />
-          <span>シャツ</span>
+          <span style={{ opacity: (innerType === 'longt' || innerType === 'turtleneck') ? 0.35 : 1 }}>シャツ</span>
         </label>
 
         {shirtVisible && (
@@ -55,14 +56,16 @@ export default function ControlPanel({
               onChange={() => setInnerType('none')} />
             <span>なし</span>
           </label>
-          <label>
+          <label style={{ opacity: shirtVisible ? 0.35 : 1 }}>
             <input type="radio" name="innerType" value="longt"
+              disabled={shirtVisible}
               checked={innerType === 'longt'}
               onChange={() => setInnerType('longt')} />
             <span>ロングT</span>
           </label>
-          <label>
+          <label style={{ opacity: shirtVisible ? 0.35 : 1 }}>
             <input type="radio" name="innerType" value="turtleneck"
+              disabled={shirtVisible}
               checked={innerType === 'turtleneck'}
               onChange={() => setInnerType('turtleneck')} />
             <span>タートル</span>
@@ -72,8 +75,9 @@ export default function ControlPanel({
         {/* タイ */}
         <label className="toggle-row">
           <input type="checkbox" checked={tieVisible}
+            disabled={!shirtVisible}
             onChange={e => setTieVisible(e.target.checked)} />
-          <span>タイ（シャツ自動切替）</span>
+          <span style={{ opacity: !shirtVisible ? 0.35 : 1 }}>タイ（シャツ自動切替）</span>
         </label>
 
         {tieVisible && (

@@ -21,13 +21,14 @@ export const TIE_COLORS = [
 export const BACKGROUNDS = [
   { id: 'gray',  label: 'ニュートラルグレー', color: '#d4d0cc' },
   { id: 'silk',  label: 'シルクホワイト',      color: '#f5f3f0' },
+  { id: 'dark',  label: 'ダーク',              color: '#1a1a1a' },
 ];
 
 // ──────────────────────────────────────────────
 // ベース画像（レイヤーの一番下）
 // ──────────────────────────────────────────────
 export const BASE_IMAGES = {
-  mannequin:      '/assets/mannequin/base/mannequin_v3.png',
+  mannequin:      '/assets/mannequin/base/mannequin_v4.png',
   shirtOpen:      '/assets/garments/shirts/base/shirt_white_open_v5.png',
   shirtClosed:    '/assets/garments/shirts/base/shirt_white_closed_v4.png',
   innerLongt:     '/assets/garments/inners/base/inner_longt_v2.png',
