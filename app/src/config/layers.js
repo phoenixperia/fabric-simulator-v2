@@ -51,6 +51,7 @@ export const MASKS = {
   tieNavyFull:        '/assets/garments/tie/masks/tie_navy_mask_v3.png',
   slacksCharcoalFull: '/assets/garments/trousers/masks/slacks_charcoal_mask_v5.png',
   vestCharcoalFull:   '/assets/garments/vests/masks/vest_charcoal_fabric_mask_v5.png',
+  vestPlacketButton:  '/assets/garments/vests/masks/vest_placket_button_mask_v1.png',
   jacketOpenFull:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketOpenPeek:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketClosedFull:   '/assets/garments/jacket/masks/jacket_closed_hem_mask_v2.png',

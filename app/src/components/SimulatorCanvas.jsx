@@ -116,6 +116,9 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         // ベストは明度−20%でジャケットとの差をつける＋輪郭線あり
         drawClipped(ctx, vestImg, vestMask, W, H, dx, dy, scaleX, scaleY, erode, dilate, false, null, vestTex, tileSize, 128, 220, vestTex ? 0.80 : 1.0);
         if (vestTex) drawGarmentEdge(ctx, vestMask, W, H, dx, dy, scaleX);
+        // 前立て・ボタン輪郭線
+        const vestPlacketMask = imgs.current[MASKS.vestPlacketButton];
+        if (vestTex && vestPlacketMask) drawGarmentEdge(ctx, vestPlacketMask, W, H, dx, dy, scaleX, 2, 0.65);
         ctx.restore();
       }
     }
@@ -190,7 +193,12 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         if (vestImg2 && vestMask2) {
           const { dx: vdx, dy: vdy, scaleX: vsx, scaleY: vsy = 1.0 } = GARMENT_OFFSETS.vestCharcoal;
           const vestTex2 = (vestTextureOn && texture) ? texture : null;
-          drawClipped(ctx, vestImg2, vestMask2, W, H, vdx, vdy, vsx, vsy, 0, 0, false, null, vestTex2, tileSize);
+          drawClipped(ctx, vestImg2, vestMask2, W, H, vdx, vdy, vsx, vsy, 0, 0, false, null, vestTex2, tileSize, 128, 220, vestTex2 ? 0.80 : 1.0);
+          // Vゾーン内でもベスト輪郭線を再描画（ジャケットに消された分を復元）
+          if (vestTex2) drawGarmentEdge(ctx, vestMask2, W, H, vdx, vdy, vsx);
+          // 前立て・ボタン輪郭線もVゾーン内で再描画
+          const vestPlacketMask2 = imgs.current[MASKS.vestPlacketButton];
+          if (vestTex2 && vestPlacketMask2) drawGarmentEdge(ctx, vestPlacketMask2, W, H, vdx, vdy, vsx, 2, 0.65);
         }
       }
 
@@ -204,7 +212,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       if (jacketTexOn && lapelMask2) {
         ctx.save();
         ctx.beginPath();
-        ctx.rect(0, H * 0.50, W, H * 0.50); // Vゾーン下（ボタンエリア）のみ
+        ctx.rect(0, H * 0.35, W, H * 0.65); // 第一ボタン含むエリア（y=35%以下）
         ctx.clip();
         drawGarmentEdge(ctx, lapelMask2, W, H, jDx, jDy, jSx, 2, 0.60);
         ctx.restore();
