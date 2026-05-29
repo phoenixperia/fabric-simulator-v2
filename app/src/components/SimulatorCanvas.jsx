@@ -150,7 +150,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       ctx.beginPath();
       // ラペル内側のVゾーン台形（1080×1440基準）
       const tY = H * 0.19;   // 上端Y（タイノット上）
-      const bY = H * 0.50;   // 下端Y（ジャケットボタン直上で止める）
+      const bY = H * 0.37;   // 下端Y（第一ボタン手前で止める）
       const tL = W * 0.458;  // 上端左
       const tR = W * 0.552;  // 上端右
       const bL = W * 0.476;  // 下端左
