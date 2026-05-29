@@ -75,16 +75,6 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         const { dx, dy, scaleX } = GARMENT_OFFSETS[shirtKey];
         const tint = hexToRgb(shirtColor);
         drawClipped(ctx, shirtImg, shirtMask, W, H, dx, dy, scaleX, 1.0, 0, 0, false, tint, null, 120, 128);
-
-        // ── シャツ裾ギャップ補完 ─────────────────────────────
-        // シャツマスクが腰サイドで途切れるため、スラックス着用時に
-        // マネキンの白い下着が透けて見える問題を解消する。
-        // シャツ色でサイドのギャップ帯を塗りつぶす。
-        ctx.fillStyle = shirtColor;
-        // 左サイド：x=4%〜26%、y=37%〜44.5%（背景端を避ける）
-        ctx.fillRect(W * 0.04, H * 0.37, W * 0.22, H * 0.075);
-        // 右サイド：x=74%〜96%、y=37%〜44.5%
-        ctx.fillRect(W * 0.74, H * 0.37, W * 0.22, H * 0.075);
       }
     }
 
