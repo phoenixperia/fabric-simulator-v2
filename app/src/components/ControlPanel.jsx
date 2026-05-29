@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { BACKGROUNDS, SHIRT_COLORS, TIE_COLORS } from '../config/layers';
 
 export default function ControlPanel({
@@ -11,30 +10,13 @@ export default function ControlPanel({
   innerType,     setInnerType,
   shirtColor,    setShirtColor,
   tieColor,      setTieColor,
-  textureLoaded, textureSrc, onTextureUpload, onTextureClear,
-  tileSize,      setTileSize,
+  textureLoaded,
   jacketTextureOn, setJacketTextureOn,
   vestTextureOn,   setVestTextureOn,
   slacksTextureOn, setSlacksTextureOn,
   background,    setBackground,
   onExport,
 }) {
-  const fileInputRef = useRef(null);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const src = ev.target.result;
-      const img = new Image();
-      img.onload = () => onTextureUpload(img, src);
-      img.src = src;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
   return (
     <div className="control-panel">
       <div className="panel-title">FIERO Fabric Simulator</div>
@@ -64,7 +46,7 @@ export default function ControlPanel({
           </div>
         )}
 
-{/* インナー */}
+        {/* インナー */}
         <div className="section-label" style={{ marginTop: 8 }}>インナー</div>
         <div className="radio-row">
           <label>
@@ -168,29 +150,6 @@ export default function ControlPanel({
               <span>クローズ</span>
             </label>
           </div>
-        )}
-      </section>
-
-      {/* 生地テクスチャ */}
-      <section className="panel-section">
-        <div className="section-label">生地テクスチャ</div>
-        <button className="btn-upload" onClick={() => fileInputRef.current?.click()}>
-          {textureLoaded ? '生地を変更' : '生地をアップロード'}
-        </button>
-        <input ref={fileInputRef} type="file" accept="image/*"
-          style={{ display: 'none' }} onChange={handleFileChange} />
-
-        {textureLoaded && (
-          <>
-            <button className="btn-clear" onClick={onTextureClear}>
-              テクスチャを削除
-            </button>
-            <div className="slider-row">
-              <span>タイルサイズ: {tileSize}px</span>
-              <input type="range" min={40} max={300} value={tileSize}
-                onChange={e => setTileSize(Number(e.target.value))} />
-            </div>
-          </>
         )}
       </section>
 
