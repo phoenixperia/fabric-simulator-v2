@@ -11,6 +11,8 @@ export default function App() {
   const [tieVisible,    setTieVisible]    = useState(false);
   const [vestVisible,   setVestVisible]   = useState(false);
   const [slacksVisible, setSlacksVisible] = useState(false);
+  const [coatVisible,   setCoatVisible]   = useState(false);
+  const [coatStyle,     setCoatStyle]     = useState('charcoal');
   const [innerType,     setInnerType]     = useState('none');
   const [shirtColor,    setShirtColor]    = useState(SHIRT_COLORS[0].color);
   const [tieColor,      setTieColor]      = useState(TIE_COLORS[0].color);
@@ -77,6 +79,8 @@ export default function App() {
           vestTextureOn={vestTextureOn}
           slacksTextureOn={slacksTextureOn}
           background={background}
+          coatVisible={coatVisible}
+          coatStyle={coatStyle}
         />
       </div>
 
@@ -93,6 +97,10 @@ export default function App() {
         setVestVisible={setVestVisible}
         slacksVisible={slacksVisible}
         setSlacksVisible={setSlacksVisible}
+        coatVisible={coatVisible}
+        setCoatVisible={setCoatVisible}
+        coatStyle={coatStyle}
+        setCoatStyle={setCoatStyle}
         innerType={innerType}
         setInnerType={setInnerType}
         shirtColor={shirtColor}

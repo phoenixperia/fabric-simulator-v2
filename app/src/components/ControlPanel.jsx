@@ -7,6 +7,8 @@ export default function ControlPanel({
   tieVisible,    setTieVisible,
   vestVisible,   setVestVisible,
   slacksVisible, setSlacksVisible,
+  coatVisible,   setCoatVisible,
+  coatStyle,     setCoatStyle,
   innerType,     setInnerType,
   shirtColor,    setShirtColor,
   tieColor,      setTieColor,
@@ -155,6 +157,13 @@ export default function ControlPanel({
             </label>
           </div>
         )}
+
+        {/* コート */}
+        <label className="toggle-row">
+          <input type="checkbox" checked={coatVisible}
+            onChange={e => setCoatVisible(e.target.checked)} />
+          <span>コート（仮・位置確認用）</span>
+        </label>
       </section>
 
       {/* 背景 */}

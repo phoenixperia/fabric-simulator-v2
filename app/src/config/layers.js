@@ -38,6 +38,7 @@ export const BASE_IMAGES = {
   vestCharcoal:   '/assets/garments/vests/base/vest_charcoal_v3.png',
   jacketOpen:     '/assets/garments/jacket/base/jacket_open_v6.png',
   jacketClosed:   '/assets/garments/jacket/base/jacket_closed_v2.png',
+  coatCharcoal:   '/assets/garments/coat/base/coat_charcoal_v1.png',
 };
 
 // ──────────────────────────────────────────────
@@ -72,6 +73,7 @@ export const GARMENT_OFFSETS = {
   vestCharcoal:   { dx: 0, dy: -5, scaleX: 1.0, erode: 3 },
   jacketOpen:     { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
   jacketClosed:   { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
+  coatCharcoal:   { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
 };
 
 // ──────────────────────────────────────────────

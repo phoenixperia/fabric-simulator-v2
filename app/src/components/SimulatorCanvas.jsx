@@ -11,7 +11,7 @@ function loadImage(src) {
 }
 
 const SimulatorCanvas = forwardRef(function SimulatorCanvas(
-  { shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background },
+  { shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background, coatVisible, coatStyle },
   ref
 ) {
   const canvasRef = useRef(null);
@@ -72,7 +72,8 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       const shirtMask = imgs.current[MASKS[maskKey]];
       if (shirtImg && shirtMask) {
         const { dx, dy, scaleX } = GARMENT_OFFSETS[shirtKey];
-        const tint = hexToRgb(shirtColor);
+        // 白シャツはtintなし（元画像が白なのでtint適用すると白飛びする）
+        const tint = shirtColor === '#ffffff' ? null : hexToRgb(shirtColor);
         drawClipped(ctx, shirtImg, shirtMask, W, H, dx, dy, scaleX, 1.0, 0, 0, false, tint, null, 120, 128);
       }
     }
@@ -169,8 +170,8 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         const shirtMask2 = imgs.current[MASKS[maskKey2]];
         if (shirtImg2 && shirtMask2) {
           const { dx: sdx, dy: sdy, scaleX: ssx } = GARMENT_OFFSETS[shirtKey2];
-          const tint = hexToRgb(shirtColor);
-          drawClipped(ctx, shirtImg2, shirtMask2, W, H, sdx, sdy, ssx, 1.0, 0, 0, false, tint, null, 120, 128);
+          const tint2 = shirtColor === '#ffffff' ? null : hexToRgb(shirtColor);
+          drawClipped(ctx, shirtImg2, shirtMask2, W, H, sdx, sdy, ssx, 1.0, 0, 0, false, tint2, null, 120, 128);
         }
       }
 
@@ -218,10 +219,13 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       }
     }
 
+    // ── コート（レイヤー⑨）── TODO: 適切な画像・マスクが揃ったら実装
+    // if (coatVisible) { ... }
+
     // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
     drawFieroLogo(ctx, W, H);
 
-  }, [shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background]);
+  }, [shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background, coatVisible, coatStyle]);
 
   useEffect(() => {
     if (ready.current) draw();
