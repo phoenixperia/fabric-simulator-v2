@@ -54,6 +54,7 @@ export const MASKS = {
   jacketOpenFull:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketOpenPeek:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketClosedFull:   '/assets/garments/jacket/masks/jacket_closed_hem_mask_v2.png',
+  jacketLapelButton:  '/assets/garments/jacket/masks/jacket_lapel_button_mask_v1.png',
 };
 
 // ──────────────────────────────────────────────

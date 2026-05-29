@@ -133,6 +133,12 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         // bgRemove=true: スタジオグレー背景を透明化（Vゾーンのグレー・白も除去）
         drawClipped(ctx, jacketImg, maskImg, W, H, dx, dy, scaleX, scaleY, erode, 0, true, null, jacketTex, tileSize);
         if (jacketTex) drawGarmentEdge(ctx, maskImg, W, H, dx, dy, scaleX);
+
+        // ラペル輪郭線（punch-through前）: ラペル面の境目。Vゾーン内はシャツが自然に被る
+        const lapelMask = imgs.current[MASKS.jacketLapelButton];
+        if (jacketTex && lapelMask) {
+          drawGarmentEdge(ctx, lapelMask, W, H, dx, dy, scaleX, 2, 0.60);
+        }
       }
 
       // ── Vゾーン punch-through ────────────────────────────────
@@ -190,6 +196,19 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
 
       ctx.restore();
       // ── punch-through ここまで ─────────────────────────────
+
+      // ボタン輪郭線（punch-through後・Vゾーン下のみ）: シャツに消されない
+      const lapelMask2 = imgs.current[MASKS.jacketLapelButton];
+      const { dx: jDx, dy: jDy, scaleX: jSx } = GARMENT_OFFSETS[jacketStyle === 'open' ? 'jacketOpen' : 'jacketClosed'];
+      const jacketTexOn = jacketTextureOn && texture;
+      if (jacketTexOn && lapelMask2) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, H * 0.50, W, H * 0.50); // Vゾーン下（ボタンエリア）のみ
+        ctx.clip();
+        drawGarmentEdge(ctx, lapelMask2, W, H, jDx, jDy, jSx, 2, 0.60);
+        ctx.restore();
+      }
     }
 
     // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
