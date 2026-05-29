@@ -97,7 +97,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       if (tieImg && tieMask) {
         const { dx, dy, scaleX, scaleY = 1.0, erode = 0 } = GARMENT_OFFSETS.tieNavy;
         const tieTint = tieColor ? hexToRgb(tieColor) : null;
-        drawClipped(ctx, tieImg, tieMask, W, H, dx, dy, scaleX, scaleY, erode, 0, false, tieTint, null, 120, 128, 50);
+        drawClipped(ctx, tieImg, tieMask, W, H, dx, dy, scaleX, scaleY, erode, 0, false, tieTint, null, 120, 128, 90);
       }
     }
 
@@ -182,7 +182,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         if (tieImg2 && tieMask2) {
           const { dx: tdx, dy: tdy, scaleX: tsx, scaleY: tsy = 1.0 } = GARMENT_OFFSETS.tieNavy;
           const tieTint = tieColor ? hexToRgb(tieColor) : null;
-          drawClipped(ctx, tieImg2, tieMask2, W, H, tdx, tdy, tsx, tsy, 0, 0, false, tieTint, null, 120, 128, 50);
+          drawClipped(ctx, tieImg2, tieMask2, W, H, tdx, tdy, tsx, tsy, 0, 0, false, tieTint, null, 120, 128, 90);
         }
       }
 

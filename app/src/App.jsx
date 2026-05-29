@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import SimulatorCanvas from './components/SimulatorCanvas';
 import ControlPanel from './components/ControlPanel';
+import CoinOverlay from './components/CoinOverlay';
 import { BACKGROUNDS, SHIRT_COLORS, TIE_COLORS } from './config/layers';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
   const [vestTextureOn,    setVestTextureOn]   = useState(true);
   const [slacksTextureOn,  setSlacksTextureOn] = useState(true);
   const [background,    setBackground]    = useState(BACKGROUNDS[0].color);
+  const [coinVisible,   setCoinVisible]   = useState(false);
 
   const canvasRef    = useRef(null);
   const fileInputRef = useRef(null);
@@ -117,12 +119,21 @@ export default function App() {
         {textureLoaded ? (
           <>
             {/* 生地テクスチャ（タイルプレビュー） */}
-            <div className="texture-preview-label">生地テクスチャ</div>
+            <div className="texture-preview-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span>生地テクスチャ</span>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontWeight: 'normal', textTransform: 'none', letterSpacing: 0, fontSize: 11, color: '#777' }}>
+                <input type="checkbox" checked={coinVisible} onChange={e => setCoinVisible(e.target.checked)} style={{ width: 12, height: 12 }} />
+                <span>100円玉</span>
+              </label>
+            </div>
             <div className="texture-tile-preview" style={{
               backgroundImage: `url(${textureSrc})`,
               backgroundSize: `${tileSize}px ${tileSize}px`,
               backgroundRepeat: 'repeat',
-            }} />
+              position: 'relative',
+            }}>
+              {coinVisible && <CoinOverlay />}
+            </div>
 
             {/* タイルサイズスライダー */}
             <div className="slider-row">
