@@ -187,6 +187,10 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       ctx.restore();
       // ── punch-through ここまで ─────────────────────────────
     }
+
+    // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
+    drawFieroLogo(ctx, W, H);
+
   }, [shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background]);
 
   useEffect(() => {
@@ -357,6 +361,48 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
   }
 
   ctx.drawImage(compCanvas, 0, 0);
+}
+
+// ── FIEROロゴ描画（最上位レイヤー）──────────────────────
+function drawFieroLogo(ctx, W, H) {
+  // 右下コーナーに配置（ウォーターマークを覆う）
+  const cx = W * 0.895;
+  const cy = H * 0.938;
+  const r1 = W * 0.076;   // 外円
+  const r2 = W * 0.065;   // 内円
+  const col = 'rgba(90, 90, 90, 0.88)';
+
+  ctx.save();
+
+  // 白背景（ロゴの視認性確保）
+  ctx.beginPath();
+  ctx.arc(cx, cy, r1 + 1, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.80)';
+  ctx.fill();
+
+  // 外円
+  ctx.beginPath();
+  ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+
+  // 内円
+  ctx.beginPath();
+  ctx.arc(cx, cy, r2, 0, Math.PI * 2);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // "Fiero" テキスト
+  const fontSize = Math.round(W * 0.052);
+  ctx.font = `italic ${fontSize}px Georgia, 'Times New Roman', serif`;
+  ctx.fillStyle = col;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Fiero', cx, cy);
+
+  ctx.restore();
 }
 
 // ── グレー背景クロマキー描画（マスク不要）──────────────
