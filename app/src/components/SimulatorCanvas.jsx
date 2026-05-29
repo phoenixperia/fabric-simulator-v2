@@ -86,6 +86,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         const { dx, dy, scaleX, erode = 0 } = GARMENT_OFFSETS.slacksCharcoal;
         const slacksTex = (slacksTextureOn && texture) ? texture : null;
         drawClipped(ctx, slacksImg, slacksMask, W, H, dx, dy, scaleX, 1.0, erode, 0, false, null, slacksTex, tileSize);
+        if (slacksTex) drawGarmentEdge(ctx, slacksMask, W, H, dx, dy, scaleX);
       }
     }
 
@@ -112,7 +113,9 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         ctx.beginPath();
         ctx.rect(0, 0, W, H * 0.62); // ベスト裾カットオフ（スラックスエリア除外）
         ctx.clip();
-        drawClipped(ctx, vestImg, vestMask, W, H, dx, dy, scaleX, scaleY, erode, dilate, false, null, vestTex, tileSize);
+        // ベストは明度−20%でジャケットとの差をつける＋輪郭線あり
+        drawClipped(ctx, vestImg, vestMask, W, H, dx, dy, scaleX, scaleY, erode, dilate, false, null, vestTex, tileSize, 128, 220, vestTex ? 0.80 : 1.0);
+        if (vestTex) drawGarmentEdge(ctx, vestMask, W, H, dx, dy, scaleX);
         ctx.restore();
       }
     }
@@ -129,6 +132,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         const jacketTex = (jacketTextureOn && texture) ? texture : null;
         // bgRemove=true: スタジオグレー背景を透明化（Vゾーンのグレー・白も除去）
         drawClipped(ctx, jacketImg, maskImg, W, H, dx, dy, scaleX, scaleY, erode, 0, true, null, jacketTex, tileSize);
+        if (jacketTex) drawGarmentEdge(ctx, maskImg, W, H, dx, dy, scaleX);
       }
 
       // ── Vゾーン punch-through ────────────────────────────────
@@ -213,7 +217,7 @@ function hexToRgb(hex) {
 }
 
 // ── マスク切り抜き描画 ──────────────────────────────
-function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, scaleY = 1.0, erode = 0, dilate = 0, bgRemove = false, tint = null, texture = null, tileSize = 120, maskThreshold = 128, tintBase = 220) {
+function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, scaleY = 1.0, erode = 0, dilate = 0, bgRemove = false, tint = null, texture = null, tileSize = 120, maskThreshold = 128, tintBase = 220, textureBrightness = 1.0) {
   const dw = Math.round(W * scaleX);
   const dh = Math.round(H * scaleY);
   const offsetX = dx + Math.round((W - dw) / 2);
@@ -329,9 +333,9 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
       if (output.data[i + 3] > 0) {
-        output.data[i]     = texData[i];
-        output.data[i + 1] = texData[i + 1];
-        output.data[i + 2] = texData[i + 2];
+        output.data[i]     = Math.min(255, Math.round(texData[i]   * textureBrightness));
+        output.data[i + 1] = Math.min(255, Math.round(texData[i+1] * textureBrightness));
+        output.data[i + 2] = Math.min(255, Math.round(texData[i+2] * textureBrightness));
       }
     }
   }
@@ -403,6 +407,55 @@ function drawFieroLogo(ctx, W, H) {
   ctx.fillText('Fiero', cx, cy);
 
   ctx.restore();
+}
+
+// ── ガーメント境界線描画 ──────────────────────────────────
+// マスクの輪郭を検出して暗色の縁取りを描く（生地適用時の境目を明確化）
+function drawGarmentEdge(ctx, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, edgeWidth = 3, edgeAlpha = 0.55) {
+  const dw = Math.round(W * scaleX);
+  const offsetX = dx + Math.round((W - dw) / 2);
+
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = W; maskCanvas.height = H;
+  const maskCtx = maskCanvas.getContext('2d');
+  maskCtx.drawImage(maskImg, offsetX, dy, dw, H);
+  const maskData = maskCtx.getImageData(0, 0, W, H);
+
+  // バイナリマスクを生成
+  const inside = new Uint8Array(W * H);
+  for (let i = 0; i < maskData.data.length; i += 4) {
+    inside[i >> 2] = (maskData.data[i] + maskData.data[i+1] + maskData.data[i+2]) / 3 > 128 ? 1 : 0;
+  }
+
+  // 境界ピクセルを検出（マスク内側で隣接ピクセルがマスク外のもの）
+  const edge = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (!inside[y * W + x]) continue;
+      let isEdge = false;
+      for (let ey = -edgeWidth; ey <= edgeWidth && !isEdge; ey++) {
+        for (let ex = -edgeWidth; ex <= edgeWidth && !isEdge; ex++) {
+          const nx = x + ex, ny = y + ey;
+          if (nx < 0 || nx >= W || ny < 0 || ny >= H || !inside[ny * W + nx]) {
+            isEdge = true;
+          }
+        }
+      }
+      edge[y * W + x] = isEdge ? 1 : 0;
+    }
+  }
+
+  // 境界ピクセルを暗色で描画
+  const edgeImg = maskCtx.createImageData(W, H);
+  const a = Math.round(edgeAlpha * 255);
+  for (let i = 0; i < edgeImg.data.length; i += 4) {
+    if (edge[i >> 2]) {
+      edgeImg.data[i] = edgeImg.data[i+1] = edgeImg.data[i+2] = 0;
+      edgeImg.data[i+3] = a;
+    }
+  }
+  maskCtx.putImageData(edgeImg, 0, 0);
+  ctx.drawImage(maskCanvas, 0, 0);
 }
 
 // ── グレー背景クロマキー描画（マスク不要）──────────────
