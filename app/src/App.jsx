@@ -40,6 +40,12 @@ export default function App() {
     e.target.value = '';
   }, []);
 
+  // シャツをOFFにしたらタイも自動的にOFF
+  const handleSetShirtVisible = useCallback((val) => {
+    setShirtVisible(val);
+    if (!val) setTieVisible(false);
+  }, []);
+
   const handleExport = useCallback(() => {
     const url = canvasRef.current?.exportPNG();
     if (!url) return;
@@ -76,7 +82,7 @@ export default function App() {
 
       <ControlPanel
         shirtVisible={shirtVisible}
-        setShirtVisible={setShirtVisible}
+        setShirtVisible={handleSetShirtVisible}
         jacketVisible={jacketVisible}
         setJacketVisible={setJacketVisible}
         jacketStyle={jacketStyle}
