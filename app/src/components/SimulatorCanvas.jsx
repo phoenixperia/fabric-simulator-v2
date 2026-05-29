@@ -330,7 +330,7 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     // 低彩度ピクセルを除去:
     //   r > 195 → スタジオグレー(210付近)・白シャツ(240-255)を除去
     //   チャコールのアンチエイリアスエッジ(r~170-193)は除去しない
-    const isBg = bgRemove && (maxC - minC) < 25 && r > 195;
+    const isBg = bgRemove && (maxC - minC) < 25 && r > 205 && r < 235;
     if (tint) {
       const lum = (r * 0.299 + g * 0.587 + b * 0.114);
       // 肌色ピクセル（顔・首・手）はtint除外（マスク境界の安全弁）
