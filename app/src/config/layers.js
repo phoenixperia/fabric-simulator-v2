@@ -20,8 +20,7 @@ export const TIE_COLORS = [
 
 export const BACKGROUNDS = [
   { id: 'gray',  label: 'ニュートラルグレー', color: '#d4d0cc' },
-  { id: 'warm',  label: 'ウォームグレー',      color: '#d8d2c8' },
-  { id: 'beige', label: 'スタジオベージュ',    color: '#e0d8cc' },
+  { id: 'silk',  label: 'シルクホワイト',      color: '#f5f3f0' },
 ];
 
 // ──────────────────────────────────────────────

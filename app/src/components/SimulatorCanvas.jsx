@@ -47,7 +47,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, W, H);
 
-    // マネキン素体（v8: 透明背景）
+    // マネキン素体（元の背景をそのまま描画）
     const mannequin = imgs.current[BASE_IMAGES.mannequin];
     if (mannequin) {
       ctx.drawImage(mannequin, 0, 0, W, H);
@@ -218,6 +218,9 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         ctx.restore();
       }
     }
+
+    // ── 背景色置換（グレー背景ピクセルを指定色に変換）────────
+    replaceBackground(ctx, W, H, background);
 
     // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
     drawFieroLogo(ctx, W, H);
@@ -483,6 +486,25 @@ function drawGarmentEdge(ctx, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, edgeW
   }
   maskCtx.putImageData(edgeImg, 0, 0);
   ctx.drawImage(maskCanvas, 0, 0);
+}
+
+// ── 背景色置換（全描画後にグレー背景ピクセルを指定色に差し替え）──
+function replaceBackground(ctx, W, H, bgHex) {
+  const [nr, ng, nb] = hexToRgb(bgHex);
+  const imageData = ctx.getImageData(0, 0, W, H);
+  const d = imageData.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+    // 肌色はより厳密に除外（赤が25以上支配的）
+    const isSkin = r > g + 25 && r > b + 25;
+    // 低彩度・中〜高輝度のピクセルを背景とみなす
+    const isGrayBg = (maxC - minC) < 30 && r > 150 && r < 248 && !isSkin;
+    if (isGrayBg) {
+      d[i] = nr; d[i+1] = ng; d[i+2] = nb;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 // ── グレー背景クロマキー描画（マスク不要）──────────────
