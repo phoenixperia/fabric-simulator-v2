@@ -173,7 +173,7 @@ export default function ControlPanel({
 
       {/* 生地テクスチャ */}
       <section className="panel-section">
-        <div className="section-label">生地テクスチャ（ジャケット）</div>
+        <div className="section-label">生地テクスチャ</div>
         <button className="btn-upload" onClick={() => fileInputRef.current?.click()}>
           {textureLoaded ? '生地を変更' : '生地をアップロード'}
         </button>
@@ -212,10 +212,7 @@ export default function ControlPanel({
       <section className="panel-section">
         <div className="section-label">準備中</div>
         <div style={{ color: '#555', fontSize: 11, lineHeight: 1.8 }}>
-          ・ジャケット クローズ<br />
-          ・スラックス マスク<br />
-          ・インナー切替（タートル / ロングT）<br />
-          ・シャツ色切替
+          ・ジャケット クローズ
         </div>
       </section>
 
