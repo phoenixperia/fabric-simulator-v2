@@ -49,7 +49,7 @@ export const MASKS = {
   innerLongtFull:     '/assets/garments/inners/masks/inner_longt_mask_v2_new.png',
   innerTurtleneckFull:'/assets/garments/inners/masks/inner_turtleneck_mask_v3.png',
   tieNavyFull:        '/assets/garments/tie/masks/tie_navy_mask_v3.png',
-  slacksCharcoalFull: '/assets/garments/trousers/masks/slacks_charcoal_mask_v2.png',
+  slacksCharcoalFull: '/assets/garments/trousers/masks/slacks_charcoal_mask_v3.png',
   vestCharcoalFull:   '/assets/garments/vests/masks/vest_charcoal_fabric_mask_v5.png',
   jacketOpenFull:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketOpenPeek:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
