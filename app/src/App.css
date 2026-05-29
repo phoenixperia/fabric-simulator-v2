@@ -1,0 +1,254 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #111;
+  color: #e8e4df;
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+.app {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* ─── キャンバスエリア ─── */
+.canvas-area {
+  flex-shrink: 0;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  line-height: 0;
+  /* 1080×1440 を 480×640 に縮小表示（3:4比率維持） */
+  width: 480px;
+  height: 640px;
+}
+
+.canvas-area canvas {
+  width: 480px;
+  height: 640px;
+  display: block;
+}
+
+/* ─── コントロールパネル ─── */
+.control-panel {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 8px;
+}
+
+.panel-section {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+/* ─── トグル・ラジオ ─── */
+.toggle-row,
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 13px;
+  padding: 2px 0;
+  user-select: none;
+}
+
+.toggle-row:hover,
+.radio-row label:hover {
+  color: #fff;
+}
+
+.radio-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #b8a88a;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+/* ─── 背景スウォッチ ─── */
+.bg-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid #444;
+  flex-shrink: 0;
+}
+
+/* ─── スライダー ─── */
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #999;
+  font-size: 11px;
+}
+
+.slider-row input[type="range"] {
+  width: 100%;
+  accent-color: #b8a88a;
+  cursor: pointer;
+}
+
+/* ─── ボタン ─── */
+.btn-upload {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #ccc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-upload:hover {
+  background: #333;
+  color: #fff;
+}
+
+.btn-clear {
+  background: transparent;
+  border: 1px solid #3a3a3a;
+  color: #888;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.15s;
+}
+
+.btn-clear:hover {
+  color: #e06060;
+  border-color: #e06060;
+}
+
+.btn-export {
+  background: #b8a88a;
+  border: none;
+  color: #111;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.btn-export:hover {
+  background: #cbbf9e;
+}
+
+/* ─── 右側テクスチャプレビューエリア ─── */
+.texture-preview-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+/* タイル繰り返しプレビュー */
+.texture-tile-preview {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 380px;
+  border-radius: 6px;
+  border: 1px solid #2a2a2a;
+  background-color: #1a1a1a;
+}
+
+/* 原画フルサイズ */
+.texture-preview-full {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #2a2a2a;
+  display: block;
+  object-fit: contain;
+  max-height: 200px;
+  background: #1a1a1a;
+}
+
+.texture-preview-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* 未アップロード時のプレースホルダー */
+.texture-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px dashed #2a2a2a;
+  border-radius: 6px;
+  min-height: 300px;
+  color: #444;
+}
+
+.texture-empty-icon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.texture-empty-text {
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+  color: #444;
+}

@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "autoPort": true,
+  "configurations": [
+    {
+      "name": "fabric-simulator",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/m1macbook/Documents/Claude code/app/Fabric Simulator2/app",
+      "port": 5173
+    }
+  ]
+}
