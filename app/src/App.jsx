@@ -12,7 +12,7 @@ export default function App() {
   const [vestVisible,   setVestVisible]   = useState(false);
   const [slacksVisible, setSlacksVisible] = useState(false);
   const [coatVisible,   setCoatVisible]   = useState(false);
-  const [coatStyle,     setCoatStyle]     = useState('charcoal');
+  const [coatType,      setCoatType]      = useState('camel');
   const [innerType,     setInnerType]     = useState('none');
   const [shirtColor,    setShirtColor]    = useState(SHIRT_COLORS[0].color);
   const [tieColor,      setTieColor]      = useState(TIE_COLORS[0].color);
@@ -22,6 +22,7 @@ export default function App() {
   const [jacketTextureOn,  setJacketTextureOn] = useState(true);
   const [vestTextureOn,    setVestTextureOn]   = useState(true);
   const [slacksTextureOn,  setSlacksTextureOn] = useState(true);
+  const [coatTextureOn,    setCoatTextureOn]   = useState(true);
   const [background,    setBackground]    = useState(BACKGROUNDS[0].color);
   const [coinVisible,   setCoinVisible]   = useState(false);
 
@@ -80,7 +81,8 @@ export default function App() {
           slacksTextureOn={slacksTextureOn}
           background={background}
           coatVisible={coatVisible}
-          coatStyle={coatStyle}
+          coatType={coatType}
+          coatTextureOn={coatTextureOn}
         />
       </div>
 
@@ -99,8 +101,10 @@ export default function App() {
         setSlacksVisible={setSlacksVisible}
         coatVisible={coatVisible}
         setCoatVisible={setCoatVisible}
-        coatStyle={coatStyle}
-        setCoatStyle={setCoatStyle}
+        coatType={coatType}
+        setCoatType={setCoatType}
+        coatTextureOn={coatTextureOn}
+        setCoatTextureOn={setCoatTextureOn}
         innerType={innerType}
         setInnerType={setInnerType}
         shirtColor={shirtColor}

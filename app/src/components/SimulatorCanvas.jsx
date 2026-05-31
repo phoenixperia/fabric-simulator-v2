@@ -11,7 +11,7 @@ function loadImage(src) {
 }
 
 const SimulatorCanvas = forwardRef(function SimulatorCanvas(
-  { shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background, coatVisible, coatStyle },
+  { shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, coatTextureOn, background, coatVisible, coatType },
   ref
 ) {
   const canvasRef = useRef(null);
@@ -219,13 +219,24 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       }
     }
 
-    // ── コート（レイヤー⑨）── TODO: 適切な画像・マスクが揃ったら実装
-    // if (coatVisible) { ... }
+    // ── コート（レイヤー⑨: ジャケット・すべての上）──
+    if (coatVisible) {
+      const coatBaseKey = coatType === 'doubleCharcoal' ? 'coatDoubleCharcoal' : 'coatCamel';
+      const coatMaskKey = coatType === 'doubleCharcoal' ? 'coatDoubleCharcoalFull' : 'coatCamelFull';
+      const coatImg  = imgs.current[BASE_IMAGES[coatBaseKey]];
+      const coatMask = imgs.current[MASKS[coatMaskKey]];
+      if (coatImg && coatMask) {
+        const { dx, dy, scaleX, erode = 0 } = GARMENT_OFFSETS[coatBaseKey];
+        const coatTex = (coatTextureOn && texture) ? texture : null;
+        drawClipped(ctx, coatImg, coatMask, W, H, dx, dy, scaleX, 1.0, erode, 0, false, null, coatTex, tileSize);
+        if (coatTex) drawGarmentEdge(ctx, coatMask, W, H, dx, dy, scaleX);
+      }
+    }
 
     // ── FIEROロゴ（最上位レイヤー・ウォーターマーク隠し）────
     drawFieroLogo(ctx, W, H);
 
-  }, [shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, background, coatVisible, coatStyle]);
+  }, [shirtVisible, jacketVisible, jacketStyle, tieVisible, vestVisible, slacksVisible, innerType, shirtColor, tieColor, texture, tileSize, jacketTextureOn, vestTextureOn, slacksTextureOn, coatTextureOn, background, coatVisible, coatType]);
 
   useEffect(() => {
     if (ready.current) draw();

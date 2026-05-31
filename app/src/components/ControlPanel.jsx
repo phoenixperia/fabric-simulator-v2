@@ -8,7 +8,8 @@ export default function ControlPanel({
   vestVisible,   setVestVisible,
   slacksVisible, setSlacksVisible,
   coatVisible,   setCoatVisible,
-  coatStyle,     setCoatStyle,
+  coatType,      setCoatType,
+  coatTextureOn, setCoatTextureOn,
   innerType,     setInnerType,
   shirtColor,    setShirtColor,
   tieColor,      setTieColor,
@@ -162,8 +163,31 @@ export default function ControlPanel({
         <label className="toggle-row">
           <input type="checkbox" checked={coatVisible}
             onChange={e => setCoatVisible(e.target.checked)} />
-          <span>コート（仮・位置確認用）</span>
+          <span>コート</span>
         </label>
+        {coatVisible && textureLoaded && (
+          <label className="toggle-row" style={{ paddingLeft: 22, fontSize: 11, color: '#555' }}>
+            <input type="checkbox" checked={coatTextureOn}
+              onChange={e => setCoatTextureOn(e.target.checked)} />
+            <span>生地を適用</span>
+          </label>
+        )}
+        {coatVisible && (
+          <div className="radio-row" style={{ paddingLeft: 22, flexWrap: 'wrap', gap: 6 }}>
+            <label>
+              <input type="radio" name="coatType" value="camel"
+                checked={coatType === 'camel'}
+                onChange={() => setCoatType('camel')} />
+              <span>チェスターコート</span>
+            </label>
+            <label>
+              <input type="radio" name="coatType" value="doubleCharcoal"
+                checked={coatType === 'doubleCharcoal'}
+                onChange={() => setCoatType('doubleCharcoal')} />
+              <span>アルスターコート</span>
+            </label>
+          </div>
+        )}
       </section>
 
       {/* 背景 */}

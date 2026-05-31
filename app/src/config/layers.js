@@ -38,7 +38,8 @@ export const BASE_IMAGES = {
   vestCharcoal:   '/assets/garments/vests/base/vest_charcoal_v3.png',
   jacketOpen:     '/assets/garments/jacket/base/jacket_open_v6.png',
   jacketClosed:   '/assets/garments/jacket/base/jacket_closed_v2.png',
-  coatCharcoal:   '/assets/garments/coat/base/coat_charcoal_v1.png',
+  coatCamel:           '/assets/garments/coat/base/coat_camel_v1.png',
+  coatDoubleCharcoal:  '/assets/garments/coat/base/coat_double_chester_charcoal_v1.png',
 };
 
 // ──────────────────────────────────────────────
@@ -57,6 +58,8 @@ export const MASKS = {
   jacketOpenPeek:     '/assets/garments/jacket/masks/jacket_open_hem_mask_v5.png',
   jacketClosedFull:   '/assets/garments/jacket/masks/jacket_closed_hem_mask_v2.png',
   jacketLapelButton:  '/assets/garments/jacket/masks/jacket_lapel_button_mask_v1.png',
+  coatCamelFull:           '/assets/garments/coat/masks/coat_camel_mask_v3.png',
+  coatDoubleCharcoalFull:  '/assets/garments/coat/masks/coat_double_chester_charcoal_mask_v1.png',
 };
 
 // ──────────────────────────────────────────────
@@ -73,7 +76,8 @@ export const GARMENT_OFFSETS = {
   vestCharcoal:   { dx: 0, dy: -5, scaleX: 1.0, erode: 3 },
   jacketOpen:     { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
   jacketClosed:   { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
-  coatCharcoal:   { dx: 0, dy: 0, scaleX: 1.0, erode: 0 },
+  coatCamel:            { dx: 0, dy: -5, scaleX: 1.0, erode: 0 },
+  coatDoubleCharcoal:   { dx: 0, dy: 0,  scaleX: 1.0, erode: 0 },
 };
 
 // ──────────────────────────────────────────────
