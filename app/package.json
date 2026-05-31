@@ -1,7 +1,10 @@
 {
   "name": "fabric-simulator",
-  "version": "8.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
