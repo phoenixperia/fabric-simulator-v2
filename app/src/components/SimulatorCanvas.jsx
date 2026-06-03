@@ -422,9 +422,12 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     shadowCanvas.width = W; shadowCanvas.height = H;
     const shadowCtx = shadowCanvas.getContext('2d');
     shadowCtx.putImageData(shadowImg, 0, 0);
+    // ブラーで陰影の境界線を滑らかにする（横帯・縦帯の硬い線を消す）
+    compCtx.filter = 'blur(18px)';
     compCtx.globalCompositeOperation = 'multiply';
     compCtx.drawImage(shadowCanvas, 0, 0);
     compCtx.globalCompositeOperation = 'source-over';
+    compCtx.filter = 'none';
   }
 
   ctx.drawImage(compCanvas, 0, 0);
