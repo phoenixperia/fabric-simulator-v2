@@ -409,9 +409,9 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     for (let i = 0; i < shadowImg.data.length; i += 4) {
       if (eroded[i >> 2]) {
         const lum = compData.data[i] * 0.299 + compData.data[i+1] * 0.587 + compData.data[i+2] * 0.114;
-        // 陰影を極めて薄く: 最暗部でも200止まり（max 20%暗くなるだけ）→ 横帯が目立たない
+        // 陰影: 最暗部でも140止まり（薄い生地でも自然に見える）
         const shadow = Math.min(1, lum / 55);
-        const v = Math.round(200 + shadow * 55);
+        const v = Math.round(140 + shadow * 115);
         shadowImg.data[i] = shadowImg.data[i+1] = shadowImg.data[i+2] = v;
         shadowImg.data[i+3] = 255;
       } else {
