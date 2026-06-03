@@ -372,7 +372,13 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     const texCanvas = document.createElement('canvas');
     texCanvas.width = W; texCanvas.height = H;
     const texCtx = texCanvas.getContext('2d');
-    texCtx.fillStyle = texCtx.createPattern(tileCanvas, 'repeat');
+    const pat = texCtx.createPattern(tileCanvas, 'repeat');
+    // タイル境界をマネキン中心からずらして縦線を目立たせない
+    const offsetX = Math.round(tileSize * 0.37);
+    const offsetY = Math.round(tileSize * 0.23);
+    const mat = new DOMMatrix().translateSelf(offsetX, offsetY);
+    pat.setTransform(mat);
+    texCtx.fillStyle = pat;
     texCtx.fillRect(0, 0, W, H);
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
@@ -392,7 +398,9 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     for (let i = 0; i < shadowImg.data.length; i += 4) {
       if (eroded[i >> 2]) {
         const lum = compData.data[i] * 0.299 + compData.data[i+1] * 0.587 + compData.data[i+2] * 0.114;
-        const v = Math.min(255, Math.round(lum * 255 / 55));
+        // 陰影を柔らかく: 最暗部でも140止まり（フロア設定）→ 薄い生地でも自然に見える
+        const shadow = Math.min(1, lum / 55);
+        const v = Math.round(140 + shadow * 115);
         shadowImg.data[i] = shadowImg.data[i+1] = shadowImg.data[i+2] = v;
         shadowImg.data[i+3] = 255;
       } else {
