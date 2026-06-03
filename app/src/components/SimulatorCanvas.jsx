@@ -369,16 +369,27 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     tileCanvas.width = tileSize; tileCanvas.height = tileSize;
     tileCanvas.getContext('2d').drawImage(texture, 0, 0, tileSize, tileSize);
 
+    // ミラータイル作成: 元画像を4方向に鏡写しで並べる → 端がどんな生地でも継ぎ目ゼロ
+    const mirrorCanvas = document.createElement('canvas');
+    mirrorCanvas.width = tileSize * 2;
+    mirrorCanvas.height = tileSize * 2;
+    const mCtx = mirrorCanvas.getContext('2d');
+    // 左上: 元画像
+    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize);
+    // 右上: 左右反転
+    mCtx.save(); mCtx.translate(tileSize * 2, 0); mCtx.scale(-1, 1);
+    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
+    // 左下: 上下反転
+    mCtx.save(); mCtx.translate(0, tileSize * 2); mCtx.scale(1, -1);
+    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
+    // 右下: 両方反転
+    mCtx.save(); mCtx.translate(tileSize * 2, tileSize * 2); mCtx.scale(-1, -1);
+    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
+
     const texCanvas = document.createElement('canvas');
     texCanvas.width = W; texCanvas.height = H;
     const texCtx = texCanvas.getContext('2d');
-    const pat = texCtx.createPattern(tileCanvas, 'repeat');
-    // タイル境界をマネキン中心からずらして縦線を目立たせない
-    const offsetX = Math.round(tileSize * 0.37);
-    const offsetY = Math.round(tileSize * 0.23);
-    const mat = new DOMMatrix().translateSelf(offsetX, offsetY);
-    pat.setTransform(mat);
-    texCtx.fillStyle = pat;
+    texCtx.fillStyle = texCtx.createPattern(mirrorCanvas, 'repeat');
     texCtx.fillRect(0, 0, W, H);
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
