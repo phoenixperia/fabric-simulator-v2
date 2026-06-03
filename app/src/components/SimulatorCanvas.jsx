@@ -364,13 +364,16 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
 
   // テクスチャ合成（C+D）
   if (texture) {
-    // [C] 生地色をそのまま貼り付け（色変換なし）
+    // [C] createPattern でシームレスなタイル描画（継ぎ目なし）
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = tileSize; tileCanvas.height = tileSize;
+    tileCanvas.getContext('2d').drawImage(texture, 0, 0, tileSize, tileSize);
+
     const texCanvas = document.createElement('canvas');
     texCanvas.width = W; texCanvas.height = H;
     const texCtx = texCanvas.getContext('2d');
-    for (let ty = 0; ty < H; ty += tileSize)
-      for (let tx = 0; tx < W; tx += tileSize)
-        texCtx.drawImage(texture, tx, ty, tileSize, tileSize);
+    texCtx.fillStyle = texCtx.createPattern(tileCanvas, 'repeat');
+    texCtx.fillRect(0, 0, W, H);
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
       if (output.data[i + 3] > 0) {
