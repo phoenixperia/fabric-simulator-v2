@@ -341,10 +341,10 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
   for (let i = 0; i < output.data.length; i += 4) {
     let r = compData.data[i], g = compData.data[i+1], b = compData.data[i+2];
     const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
-    // 低彩度ピクセルを除去:
-    //   r > 195 → スタジオグレー(210付近)・白シャツ(240-255)を除去
-    //   チャコールのアンチエイリアスエッジ(r~170-193)は除去しない
-    const isBg = bgRemove && (maxC - minC) < 25 && r > 205 && r < 235;
+    // 低彩度ピクセルを除去（スタジオ背景グレーのみ）:
+    //   条件を厳しくし、ラペル端の半透明ピクセルを誤検出しない
+    //   彩度差 < 18 かつ r が 212〜228 の狭い範囲のみ除去
+    const isBg = bgRemove && (maxC - minC) < 18 && r > 212 && r < 228;
     if (tint) {
       const lum = (r * 0.299 + g * 0.587 + b * 0.114);
       // 肌色ピクセル（顔・首・手）はtint除外（マスク境界の安全弁）
