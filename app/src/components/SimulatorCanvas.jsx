@@ -409,9 +409,9 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     for (let i = 0; i < shadowImg.data.length; i += 4) {
       if (eroded[i >> 2]) {
         const lum = compData.data[i] * 0.299 + compData.data[i+1] * 0.587 + compData.data[i+2] * 0.114;
-        // 陰影を柔らかく: 最暗部でも140止まり（フロア設定）→ 薄い生地でも自然に見える
+        // 陰影を極めて薄く: 最暗部でも200止まり（max 20%暗くなるだけ）→ 横帯が目立たない
         const shadow = Math.min(1, lum / 55);
-        const v = Math.round(140 + shadow * 115);
+        const v = Math.round(200 + shadow * 55);
         shadowImg.data[i] = shadowImg.data[i+1] = shadowImg.data[i+2] = v;
         shadowImg.data[i+3] = 255;
       } else {
@@ -422,12 +422,9 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     shadowCanvas.width = W; shadowCanvas.height = H;
     const shadowCtx = shadowCanvas.getContext('2d');
     shadowCtx.putImageData(shadowImg, 0, 0);
-    // ブラーで陰影の境界線を滑らかにする（横帯・縦帯の硬い線を消す）
-    compCtx.filter = 'blur(18px)';
     compCtx.globalCompositeOperation = 'multiply';
     compCtx.drawImage(shadowCanvas, 0, 0);
     compCtx.globalCompositeOperation = 'source-over';
-    compCtx.filter = 'none';
   }
 
   ctx.drawImage(compCanvas, 0, 0);
