@@ -18,7 +18,7 @@ export default function App() {
   const [tieColor,      setTieColor]      = useState(TIE_COLORS[0].color);
   const [texture,          setTexture]         = useState(null);
   const [textureSrc,       setTextureSrc]      = useState(null);
-  const [tileSize,         setTileSize]        = useState(120);
+  const [tileSize,         setTileSize]        = useState(200);
   const [jacketTextureOn,  setJacketTextureOn] = useState(true);
   const [vestTextureOn,    setVestTextureOn]   = useState(true);
   const [slacksTextureOn,  setSlacksTextureOn] = useState(true);

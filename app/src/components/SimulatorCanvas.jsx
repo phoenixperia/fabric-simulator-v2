@@ -369,27 +369,45 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     tileCanvas.width = tileSize; tileCanvas.height = tileSize;
     tileCanvas.getContext('2d').drawImage(texture, 0, 0, tileSize, tileSize);
 
-    // ミラータイル作成: 元画像を4方向に鏡写しで並べる → 端がどんな生地でも継ぎ目ゼロ
+    // ミラータイル作成:
+    // ① 小さいミラータイル(2*tileSize)を作る
+    // ② それをキャンバス全体(W×H)を1枚で覆えるサイズまで繰り返して「大タイル」を作る
+    // ③ 大タイルを再度ミラー → 外側の継ぎ目がキャンバス外に出る = 実質継ぎ目なし
+    const smallMirror = document.createElement('canvas');
+    smallMirror.width = tileSize * 2; smallMirror.height = tileSize * 2;
+    const sm = smallMirror.getContext('2d');
+    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize);
+    sm.save(); sm.translate(tileSize * 2, 0); sm.scale(-1, 1);
+    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
+    sm.save(); sm.translate(0, tileSize * 2); sm.scale(1, -1);
+    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
+    sm.save(); sm.translate(tileSize * 2, tileSize * 2); sm.scale(-1, -1);
+    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
+
+    // キャンバスを1枚で覆える大タイルを作成（W×H以上のサイズ）
+    const bigSize = Math.max(W, H);
+    const bigCanvas = document.createElement('canvas');
+    bigCanvas.width = bigSize; bigCanvas.height = bigSize;
+    const bigCtx = bigCanvas.getContext('2d');
+    bigCtx.fillStyle = bigCtx.createPattern(smallMirror, 'repeat');
+    bigCtx.fillRect(0, 0, bigSize, bigSize);
+
+    // 大タイルを再度ミラー → 外側継ぎ目は bigSize*2 ≒ 2880px先 = キャンバス外
     const mirrorCanvas = document.createElement('canvas');
-    mirrorCanvas.width = tileSize * 2;
-    mirrorCanvas.height = tileSize * 2;
+    mirrorCanvas.width = bigSize * 2; mirrorCanvas.height = bigSize * 2;
     const mCtx = mirrorCanvas.getContext('2d');
-    // 左上: 元画像
-    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize);
-    // 右上: 左右反転
-    mCtx.save(); mCtx.translate(tileSize * 2, 0); mCtx.scale(-1, 1);
-    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
-    // 左下: 上下反転
-    mCtx.save(); mCtx.translate(0, tileSize * 2); mCtx.scale(1, -1);
-    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
-    // 右下: 両方反転
-    mCtx.save(); mCtx.translate(tileSize * 2, tileSize * 2); mCtx.scale(-1, -1);
-    mCtx.drawImage(tileCanvas, 0, 0, tileSize, tileSize); mCtx.restore();
+    mCtx.drawImage(bigCanvas, 0, 0);
+    mCtx.save(); mCtx.translate(bigSize * 2, 0); mCtx.scale(-1, 1);
+    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
+    mCtx.save(); mCtx.translate(0, bigSize * 2); mCtx.scale(1, -1);
+    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
+    mCtx.save(); mCtx.translate(bigSize * 2, bigSize * 2); mCtx.scale(-1, -1);
+    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
 
     const texCanvas = document.createElement('canvas');
     texCanvas.width = W; texCanvas.height = H;
     const texCtx = texCanvas.getContext('2d');
-    texCtx.fillStyle = texCtx.createPattern(mirrorCanvas, 'repeat');
+    texCtx.fillStyle = texCtx.createPattern(mirrorCanvas, 'no-repeat');
     texCtx.fillRect(0, 0, W, H);
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
