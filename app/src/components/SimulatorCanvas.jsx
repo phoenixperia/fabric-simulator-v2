@@ -369,45 +369,51 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     tileCanvas.width = tileSize; tileCanvas.height = tileSize;
     tileCanvas.getContext('2d').drawImage(texture, 0, 0, tileSize, tileSize);
 
-    // ミラータイル作成:
-    // ① 小さいミラータイル(2*tileSize)を作る
-    // ② それをキャンバス全体(W×H)を1枚で覆えるサイズまで繰り返して「大タイル」を作る
-    // ③ 大タイルを再度ミラー → 外側の継ぎ目がキャンバス外に出る = 実質継ぎ目なし
-    const smallMirror = document.createElement('canvas');
-    smallMirror.width = tileSize * 2; smallMirror.height = tileSize * 2;
-    const sm = smallMirror.getContext('2d');
-    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize);
-    sm.save(); sm.translate(tileSize * 2, 0); sm.scale(-1, 1);
-    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
-    sm.save(); sm.translate(0, tileSize * 2); sm.scale(1, -1);
-    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
-    sm.save(); sm.translate(tileSize * 2, tileSize * 2); sm.scale(-1, -1);
-    sm.drawImage(tileCanvas, 0, 0, tileSize, tileSize); sm.restore();
+    // シームレスタイル生成（オフセットブレンド法）:
+    // 元画像を半分ずらしたコピーを作り、中心=元画像・外縁=ずらし版でブレンド
+    // → エッジが完全一致するタイル = ミラー不要・継ぎ目ゼロ
+    const half = Math.floor(tileSize / 2);
+    const origData = tileCanvas.getContext('2d').getImageData(0, 0, tileSize, tileSize).data;
 
-    // キャンバスを1枚で覆える大タイルを作成（W×H以上のサイズ）
-    const bigSize = Math.max(W, H);
-    const bigCanvas = document.createElement('canvas');
-    bigCanvas.width = bigSize; bigCanvas.height = bigSize;
-    const bigCtx = bigCanvas.getContext('2d');
-    bigCtx.fillStyle = bigCtx.createPattern(smallMirror, 'repeat');
-    bigCtx.fillRect(0, 0, bigSize, bigSize);
+    // オフセット版（半分ずらしてラップ）
+    const offData = new Uint8ClampedArray(tileSize * tileSize * 4);
+    for (let y = 0; y < tileSize; y++) {
+      for (let x = 0; x < tileSize; x++) {
+        const ox = (x + half) % tileSize;
+        const oy = (y + half) % tileSize;
+        const si = (oy * tileSize + ox) * 4;
+        const di = (y * tileSize + x) * 4;
+        offData[di] = origData[si]; offData[di+1] = origData[si+1];
+        offData[di+2] = origData[si+2]; offData[di+3] = 255;
+      }
+    }
 
-    // 大タイルを再度ミラー → 外側継ぎ目は bigSize*2 ≒ 2880px先 = キャンバス外
-    const mirrorCanvas = document.createElement('canvas');
-    mirrorCanvas.width = bigSize * 2; mirrorCanvas.height = bigSize * 2;
-    const mCtx = mirrorCanvas.getContext('2d');
-    mCtx.drawImage(bigCanvas, 0, 0);
-    mCtx.save(); mCtx.translate(bigSize * 2, 0); mCtx.scale(-1, 1);
-    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
-    mCtx.save(); mCtx.translate(0, bigSize * 2); mCtx.scale(1, -1);
-    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
-    mCtx.save(); mCtx.translate(bigSize * 2, bigSize * 2); mCtx.scale(-1, -1);
-    mCtx.drawImage(bigCanvas, 0, 0); mCtx.restore();
+    // ブレンド: 中心→元画像(柄が整う), エッジ→オフセット版(継ぎ目なし)
+    const seamlessCanvas = document.createElement('canvas');
+    seamlessCanvas.width = tileSize; seamlessCanvas.height = tileSize;
+    const sCtx = seamlessCanvas.getContext('2d');
+    const sImg = sCtx.createImageData(tileSize, tileSize);
+    const blendZone = 0.3; // エッジ側30%をブレンド
+    for (let y = 0; y < tileSize; y++) {
+      for (let x = 0; x < tileSize; x++) {
+        const idx = (y * tileSize + x) * 4;
+        const dx = Math.abs(x - half) / half;
+        const dy = Math.abs(y - half) / half;
+        const d  = Math.max(dx, dy);
+        const innerR = 1 - blendZone;
+        const w = d < innerR ? 1 : Math.max(0, 1 - (d - innerR) / blendZone);
+        for (let c = 0; c < 3; c++) {
+          sImg.data[idx + c] = Math.round(origData[idx + c] * w + offData[idx + c] * (1 - w));
+        }
+        sImg.data[idx + 3] = 255;
+      }
+    }
+    sCtx.putImageData(sImg, 0, 0);
 
     const texCanvas = document.createElement('canvas');
     texCanvas.width = W; texCanvas.height = H;
     const texCtx = texCanvas.getContext('2d');
-    texCtx.fillStyle = texCtx.createPattern(mirrorCanvas, 'no-repeat');
+    texCtx.fillStyle = texCtx.createPattern(seamlessCanvas, 'repeat');
     texCtx.fillRect(0, 0, W, H);
     const texData = texCtx.getImageData(0, 0, W, H).data;
     for (let i = 0; i < output.data.length; i += 4) {
