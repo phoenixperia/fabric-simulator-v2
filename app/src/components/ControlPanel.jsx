@@ -142,22 +142,6 @@ export default function ControlPanel({
             <span>生地を適用</span>
           </label>
         )}
-        {jacketVisible && (
-          <div className="radio-row" style={{ paddingLeft: 22 }}>
-            <label>
-              <input type="radio" name="jacketStyle" value="open"
-                checked={jacketStyle === 'open'}
-                onChange={() => setJacketStyle('open')} />
-              <span>オープン</span>
-            </label>
-            <label>
-              <input type="radio" name="jacketStyle" value="closed"
-                checked={jacketStyle === 'closed'}
-                onChange={() => setJacketStyle('closed')} />
-              <span>クローズ</span>
-            </label>
-          </div>
-        )}
 
         {/* コート */}
         <label className="toggle-row">

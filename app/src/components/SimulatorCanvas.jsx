@@ -114,7 +114,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         ctx.rect(0, 0, W, H * 0.62); // ベスト裾カットオフ（スラックスエリア除外）
         ctx.clip();
         // ベストは明度−20%でジャケットとの差をつける＋輪郭線あり
-        drawClipped(ctx, vestImg, vestMask, W, H, dx, dy, scaleX, scaleY, erode, dilate, false, null, vestTex, tileSize, 128, 220, vestTex ? 0.80 : 1.0);
+        drawClipped(ctx, vestImg, vestMask, W, H, dx, dy, scaleX, scaleY, erode, dilate, false, null, vestTex, tileSize, 128, 220, vestTex ? 0.90 : 1.0);
         if (vestTex) drawGarmentEdge(ctx, vestMask, W, H, dx, dy, scaleX);
         // 前立て・ボタン輪郭線
         const vestPlacketMask = imgs.current[MASKS.vestPlacketButton];
