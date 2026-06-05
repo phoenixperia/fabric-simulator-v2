@@ -393,15 +393,18 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
     seamlessCanvas.width = tileSize; seamlessCanvas.height = tileSize;
     const sCtx = seamlessCanvas.getContext('2d');
     const sImg = sCtx.createImageData(tileSize, tileSize);
-    const blendZone = 0.3; // エッジ側30%をブレンド
+    const blendZone = 0.45; // エッジ側45%をブレンド
     for (let y = 0; y < tileSize; y++) {
       for (let x = 0; x < tileSize; x++) {
         const idx = (y * tileSize + x) * 4;
         const dx = Math.abs(x - half) / half;
         const dy = Math.abs(y - half) / half;
-        const d  = Math.max(dx, dy);
+        // 円形距離（Chebyshev→Euclidean）: 四角いブレンドゾーン境界をなくす
+        const d  = Math.min(1, Math.sqrt(dx * dx + dy * dy));
         const innerR = 1 - blendZone;
-        const w = d < innerR ? 1 : Math.max(0, 1 - (d - innerR) / blendZone);
+        // smoothstep: 線形より滑らかな曲線でブレンド
+        const t = Math.max(0, Math.min(1, (d - innerR) / blendZone));
+        const w = 1 - t * t * (3 - 2 * t);
         for (let c = 0; c < 3; c++) {
           sImg.data[idx + c] = Math.round(origData[idx + c] * w + offData[idx + c] * (1 - w));
         }
