@@ -388,25 +388,29 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
       }
     }
 
-    // ブレンド: 中心→元画像(柄が整う), エッジ→オフセット版(継ぎ目なし)
+    // エッジのみブレンド（3px幅）: 内部は元画像そのまま・エッジだけオフセット版でつなぐ
+    // → ブレンドゾーンが見えない幅なので継ぎ目なし・柄の乱れなし
     const seamlessCanvas = document.createElement('canvas');
     seamlessCanvas.width = tileSize; seamlessCanvas.height = tileSize;
     const sCtx = seamlessCanvas.getContext('2d');
     const sImg = sCtx.createImageData(tileSize, tileSize);
-    const blendZone = 0.45; // エッジ側45%をブレンド
+    const edgePx = 3; // エッジのブレンド幅（px）
     for (let y = 0; y < tileSize; y++) {
       for (let x = 0; x < tileSize; x++) {
         const idx = (y * tileSize + x) * 4;
-        const dx = Math.abs(x - half) / half;
-        const dy = Math.abs(y - half) / half;
-        // 円形距離（Chebyshev→Euclidean）: 四角いブレンドゾーン境界をなくす
-        const d  = Math.min(1, Math.sqrt(dx * dx + dy * dy));
-        const innerR = 1 - blendZone;
-        // smoothstep: 線形より滑らかな曲線でブレンド
-        const t = Math.max(0, Math.min(1, (d - innerR) / blendZone));
-        const w = 1 - t * t * (3 - 2 * t);
-        for (let c = 0; c < 3; c++) {
-          sImg.data[idx + c] = Math.round(origData[idx + c] * w + offData[idx + c] * (1 - w));
+        const dist = Math.min(x, y, tileSize - 1 - x, tileSize - 1 - y);
+        if (dist >= edgePx) {
+          // 内部: 元画像そのまま
+          sImg.data[idx]   = origData[idx];
+          sImg.data[idx+1] = origData[idx+1];
+          sImg.data[idx+2] = origData[idx+2];
+        } else {
+          // エッジ: smoothstep でオフセット版へブレンド（0=エッジ→offset, 1=内部→orig）
+          const t = dist / edgePx;
+          const w = t * t * (3 - 2 * t);
+          for (let c = 0; c < 3; c++) {
+            sImg.data[idx+c] = Math.round(origData[idx+c] * w + offData[idx+c] * (1-w));
+          }
         }
         sImg.data[idx + 3] = 255;
       }
