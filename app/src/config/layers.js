@@ -10,7 +10,7 @@ export const SHIRT_COLORS = [
 
 export const TIE_COLORS = [
   { id: 'navy',      label: 'ネイビー',          color: null },
-  { id: 'burgundy',  label: 'ボルドー',          color: '#6B1A2A' },
+  { id: 'burgundy',  label: 'バーガンディー',     color: '#561620' },
   { id: 'silver',    label: 'シルバー',          color: '#B8B8B8' },
   { id: 'champagne', label: 'シャンパンゴールド', color: '#C9A84C' },
   { id: 'brown',     label: 'ダークブラウン',    color: '#3D2010' },
