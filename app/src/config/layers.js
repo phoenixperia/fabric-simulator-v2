@@ -12,7 +12,7 @@ export const TIE_COLORS = [
   { id: 'navy',      label: 'ネイビー',          color: null },
   { id: 'burgundy',  label: 'バーガンディー',     color: '#561620' },
   { id: 'silver',    label: 'シルバー',          color: '#B8B8B8' },
-  { id: 'champagne', label: 'シャンパンゴールド', color: '#C9A84C' },
+  { id: 'champagne', label: 'シャンパンゴールド', color: '#C9A84C', highlight: '#FFFDF5' },
   { id: 'brown',     label: 'ダークブラウン',    color: '#3D2010' },
   { id: 'green',     label: 'ダークグリーン',    color: '#1B4332' },
   { id: 'pink',      label: '薄いピンク',        color: '#F4C2C2' },

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { CANVAS_W, CANVAS_H, BASE_IMAGES, MASKS, GARMENT_OFFSETS } from '../config/layers';
+import { CANVAS_W, CANVAS_H, BASE_IMAGES, MASKS, GARMENT_OFFSETS, TIE_COLORS } from '../config/layers';
 
 function loadImage(src) {
   return new Promise((resolve) => {
@@ -97,7 +97,9 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
       if (tieImg && tieMask) {
         const { dx, dy, scaleX, scaleY = 1.0, erode = 0 } = GARMENT_OFFSETS.tieNavy;
         const tieTint = tieColor ? hexToRgb(tieColor) : null;
-        drawClipped(ctx, tieImg, tieMask, W, H, dx, dy, scaleX, scaleY, erode, 0, false, tieTint, null, 120, 128, 90);
+        const tieEntry = TIE_COLORS.find(tc => tc.color === tieColor);
+        const tieHighlight = tieEntry?.highlight ? hexToRgb(tieEntry.highlight) : null;
+        drawClipped(ctx, tieImg, tieMask, W, H, dx, dy, scaleX, scaleY, erode, 0, false, tieTint, null, 120, 128, 90, 1.0, tieHighlight);
       }
     }
 
@@ -182,7 +184,9 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(
         if (tieImg2 && tieMask2) {
           const { dx: tdx, dy: tdy, scaleX: tsx, scaleY: tsy = 1.0 } = GARMENT_OFFSETS.tieNavy;
           const tieTint = tieColor ? hexToRgb(tieColor) : null;
-          drawClipped(ctx, tieImg2, tieMask2, W, H, tdx, tdy, tsx, tsy, 0, 0, false, tieTint, null, 120, 128, 90);
+          const tieEntry2 = TIE_COLORS.find(tc => tc.color === tieColor);
+          const tieHighlight2 = tieEntry2?.highlight ? hexToRgb(tieEntry2.highlight) : null;
+          drawClipped(ctx, tieImg2, tieMask2, W, H, tdx, tdy, tsx, tsy, 0, 0, false, tieTint, null, 120, 128, 90, 1.0, tieHighlight2);
         }
       }
 
@@ -258,7 +262,7 @@ function hexToRgb(hex) {
 }
 
 // ── マスク切り抜き描画 ──────────────────────────────
-function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, scaleY = 1.0, erode = 0, dilate = 0, bgRemove = false, tint = null, texture = null, tileSize = 120, maskThreshold = 128, tintBase = 220, textureBrightness = 1.0) {
+function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 1.0, scaleY = 1.0, erode = 0, dilate = 0, bgRemove = false, tint = null, texture = null, tileSize = 120, maskThreshold = 128, tintBase = 220, textureBrightness = 1.0, tintHighlight = null) {
   const dw = Math.round(W * scaleX);
   const dh = Math.round(H * scaleY);
   const offsetX = dx + Math.round((W - dw) / 2);
@@ -350,10 +354,18 @@ function drawClipped(ctx, compositeImg, maskImg, W, H, dx = 0, dy = 0, scaleX = 
       // 肌色ピクセル（顔・首・手）はtint除外（マスク境界の安全弁）
       const isSkinTone = r > g + 12 && r > b + 20 && lum < 230;
       if (!isSkinTone) {
-        const scale = lum / tintBase;
-        r = Math.min(255, Math.round(tint[0] * scale));
-        g = Math.min(255, Math.round(tint[1] * scale));
-        b = Math.min(255, Math.round(tint[2] * scale));
+        if (tintHighlight) {
+          // メタリック: shadow(tint) → highlight を輝度でブレンド
+          const t = Math.min(1, Math.max(0, lum / tintBase));
+          r = Math.round(tint[0] * (1 - t) + tintHighlight[0] * t);
+          g = Math.round(tint[1] * (1 - t) + tintHighlight[1] * t);
+          b = Math.round(tint[2] * (1 - t) + tintHighlight[2] * t);
+        } else {
+          const scale = lum / tintBase;
+          r = Math.min(255, Math.round(tint[0] * scale));
+          g = Math.min(255, Math.round(tint[1] * scale));
+          b = Math.min(255, Math.round(tint[2] * scale));
+        }
       }
     }
     output.data[i]   = r;
